@@ -1,67 +1,98 @@
-# DegenToken Smart Contract
+# DegenToken README
 
 ## Overview
-`DegenToken` is an ERC20 token based on Solidity using OpenZeppelin libraries. It provides functionality to mint and burn tokens, manage redeemable items, and allow users to redeem tokens for specific items. This smart contract is designed with a marketplace feature where users can exchange their tokens for virtual items.
+
+The **DegenToken** is an ERC20 token contract that allows users to mint, burn, and redeem tokens for various items. Built using Solidity and the OpenZeppelin library, this contract provides a simple interface for managing a token economy where users can earn and spend tokens.
 
 ## Features
-- **Minting Tokens**: The owner or other specified addresses can mint tokens to specified users.
-- **Burning Tokens**: Users can burn their tokens, reducing the total supply.
-- **Adding Redeemable Items**: The owner can add items that users can redeem using tokens.
-- **Redeeming Tokens for Items**: Users can redeem their tokens for specific items.
-- **Track Redeemed Items**: The contract maintains a record of redeemed items by each user.
 
-## Contract Details
+- **ERC20 Compliance**: The token follows the ERC20 standard, allowing compatibility with existing wallets and dApps.
+- **Minting**: Allows the owner to mint new tokens to a specified address.
+- **Burning**: Users can burn their tokens, reducing the total supply.
+- **Item Management**: Owners can add items with associated prices that users can redeem using tokens.
+- **Redemption Tracking**: The contract tracks which items have been redeemed by each user.
 
-### Constructor
+## Smart Contract Details
 
-- **DegenToken (string name, string symbol)**:
-  Initializes the token with the name "Degen" and symbol "DGN". The contract deployer is made the owner.
+### Contract Inheritance
 
-### State Variables
-- **items** (`mapping(uint => Item)`)  
-  A mapping that stores items available for redemption, where the key is `itemId`.
-  
-- **itemCount** (`uint`)  
-  Tracks the number of items available in the marketplace.
+The contract inherits from:
+- `ERC20`: Provides the standard ERC20 token functionality.
+- `Ownable`: Restricts certain functions to the contract owner.
 
-- **redeemedItems** (`mapping(address => mapping(uint => bool))`)  
-  A nested mapping that tracks whether a user has redeemed a particular item.
+### Key Components
 
-### Structs
-- **Item**:
-  - `itemId` (uint): Unique identifier for the item.
-  - `itemName` (string): Name of the item.
-  - `itemPrice` (uint): Price of the item in tokens.
+- **Structs**:
+  - `Item`: Represents an item with an ID, name, and price.
 
-### Functions
-
-#### Token Operations
-
-- **mint(address receiver, uint amount)**:
-  - Mints the specified `amount` of tokens to the `receiver`'s address.
-  
-- **burn(uint amount)**:
-  - Burns the specified `amount` of tokens from the caller's balance and emits a `BurnToken` event.
-
-#### Marketplace Operations
-
-- **addItem(string memory itemName, uint itemPrice)**:
-  - Adds a new item to the marketplace with the given `itemName` and `itemPrice`. This increases `itemCount`.
-
-- **getItems() external view returns (Item[] memory)**:
-  - Returns an array containing all the items in the marketplace.
-
-- **redeem(uint rewardCategory)**:
-  - Allows users to redeem tokens for items based on `rewardCategory`. Tokens are burned, and the transaction is logged using the `RedeemToken` event.
+- **State Variables**:
+  - `items`: A mapping from item IDs to item details.
+  - `itemCount`: Tracks the number of items added.
+  - `redeemedItems`: A nested mapping that tracks redeemed items for each user.
 
 ### Events
 
-- **RedeemToken(address account, uint rewardCategory)**:
-  - Emitted when tokens are redeemed by a user for a specific reward category.
+The contract emits the following events:
+- `RedeemToken`: Logs when a user redeems tokens for a specific item.
+- `BurnToken`: Logs when tokens are burned by a user.
+- `ItemRedeemed`: Logs the details of the item redeemed by a user.
 
-- **BurnToken(address account, uint amount)**:
-  - Emitted when a user burns tokens.
+### Functions
 
-- **ItemRedeemed(address indexed user, uint indexed itemId, string itemName, uint itemPrice)**:
-  - Emitted when a user redeems an item.
+- **Constructor**: Initializes the token with a name and symbol, and transfers ownership to the deployer.
 
+- **mint**: 
+  ```solidity
+  function mint(address receiver, uint amount) public;
+  ```
+  Mints a specified amount of tokens to the given address.
+
+- **burn**: 
+  ```solidity
+  function burn(uint amount) public;
+  ```
+  Burns a specified amount of tokens from the caller's balance.
+
+- **addItem**: 
+  ```solidity
+  function addItem(string memory itemName, uint itemPrice) public;
+  ```
+  Adds a new item to the items mapping.
+
+- **getItems**: 
+  ```solidity
+  function getItems() external view returns (Item[] memory);
+  ```
+  Returns an array of all items added to the contract.
+
+- **redeem**: 
+  ```solidity
+  function redeem(uint rewardCategory) public;
+  ```
+  Allows a user to redeem an item using tokens. The required amount is calculated based on the `rewardCategory`.
+
+## Usage
+
+1. **Deployment**: Deploy the DegenToken contract on the Ethereum network.
+2. **Mint Tokens**: The contract owner can mint tokens to any address using the `mint` function.
+3. **Add Items**: The owner can add items to the contract using the `addItem` function.
+4. **Redeem Items**: Users can redeem items by calling the `redeem` function with the appropriate reward category.
+
+## Example
+
+Here’s an example of how to use the contract:
+
+1. **Mint Tokens**:
+   ```solidity
+   degenToken.mint(userAddress, 100);
+   ```
+
+2. **Add Items**:
+   ```solidity
+   degenToken.addItem("Item Name", 1);
+   ```
+
+3. **Redeem Item**:
+   ```solidity
+   degenToken.redeem(1);
+   ```
